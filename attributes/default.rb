@@ -30,7 +30,7 @@ default[:zenoss][:device][:properties]      = {} #overwritten by roles or on nod
 default[:zenoss][:device][:templates]       = [] #overwritten by roles or on nodes
 default[:zenoss][:server][:version]         = "3.2.1-0"
 default[:zenoss][:server][:zenoss_pubkey]   = "" #gets set in the server recipe, read by clients
-case node['platform']
+case node[:platform]
 when "ubuntu","debian"
   default[:zenoss][:server][:zenhome]         = "/usr/local/zenoss/zenoss" #RPM is different
 when "redhat","centos","scientific"

@@ -92,7 +92,7 @@ action :run do
 
   Chef::Log.debug batch
   #write the content to a temp file
-  file "/tmp/chefzenbatch.batch" do
+  file "#{Chef::Config[:file_cache_path]}/chefzenbatch.batch" do
     owner "zenoss"
     mode "0600"
     content batch
@@ -106,7 +106,7 @@ action :run do
         'PYTHONPATH' => "#{node[:zenoss][:server][:zenhome]}/lib/python",
         'ZENHOME' => node[:zenoss][:server][:zenhome]
       })
-    command "#{node[:zenoss][:server][:zenhome]}/bin/zenbatchload /tmp/chefzenbatch.batch"
+    command "#{node[:zenoss][:server][:zenhome]}/bin/zenbatchload #{Chef::Config[:file_cache_path]}/chefzenbatch.batch"
     action :run
   end
 end

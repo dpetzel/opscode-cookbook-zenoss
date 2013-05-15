@@ -59,7 +59,7 @@ when "centos","redhat","scientific"
   end
 
   yum_package "zenoss" do
-    arch node['kernel']['machine']
+    arch node[:kernel][:machine]
     action :install
   end
 
@@ -83,7 +83,7 @@ when "debian","ubuntu"
 
   #Zenoss hasn't signed their repository http://dev.zenoss.org/trac/ticket/7421
   apt_package "zenoss-stack" do
-    version node["zenoss"]["server"]["version"]
+    version node[:zenoss][:server][:version]
     options "--allow-unauthenticated"
     action :install
   end
@@ -92,8 +92,8 @@ end
 
 
 #apply post 3.2.0 patches from http://dev.zenoss.com/trac/report/6 marked 'closed'
-if node['zenoss'] and node['zenoss']['server'] and node['zenoss']['server']['zenpatches']
-  node['zenoss']['server']['zenpatches'].each do |patch, url|
+if node[:zenoss] and node[:zenoss][:server] and node[:zenoss][:server][:zenpatches]
+  node[:zenoss][:server][:zenpatches].each do |patch, url|
     zenoss_zenpatch patch do
       ticket url
       action :install
@@ -103,7 +103,7 @@ end
 
 #the Zenoss installer puts the service in place, just start it
 service "zenoss" do
-  case node["platform"]
+  case node[:platform]
   when "debian", "ubuntu"
     service_name "zenoss-stack"
   when "redhat", "centos", "scientific"
@@ -156,15 +156,15 @@ execute "ssh-keygen -q -t dsa -f /home/zenoss/.ssh/id_dsa -N \"\" " do
   user "zenoss"
   action :run
   not_if {File.exists?("/home/zenoss/.ssh/id_dsa.pub")}
-  notifies :create, resources(:ruby_block => "zenoss public key"), :immediate
+  notifies :create, "ruby_block[zenoss public key]", :immediate
 end
 
 #this list should get appended by other recipes
-node["zenoss"]["server"]["installed_zenpacks"].each do |package, zpversion|
-  zenoss_zenpack "#{package}" do
+node[:zenoss][:server][:installed_zenpacks].each do |package, zpversion|
+  zenoss_zenpack package do
     version zpversion
     action :install
-    notifies :restart, resources(:service => "zenoss"), :immediate
+    notifies :restart, "service[zenoss]", :immediate
   end
 end
 
@@ -223,8 +223,8 @@ systems.collect! {|sys| sys.gsub('::', '/')}
 #using the nodes list, write out a zenbatchload
 #find all the device classes and the devices each one has.
 nodes.each do |node|
-  if node['zenoss'] and node['zenoss']['device']
-    dclass = node['zenoss']['device']['device_class']
+  if node[:zenoss] and node[:zenoss][:device]
+    dclass = node[:zenoss][:device][:device_class]
     if devices.has_key?(dclass)
       devices[dclass]['nodes'].push(node)
     else
