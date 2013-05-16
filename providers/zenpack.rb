@@ -38,11 +38,11 @@ action :install do
       user "zenoss"
       cwd Chef::Config[:file_cache_path]
       environment ({
-                     'LD_LIBRARY_PATH' => "#{node[:zenoss][:server][:zenhome]}/lib",
-                     'PYTHONPATH' => "#{node[:zenoss][:server][:zenhome]}/lib/python",
-                     'ZENHOME' => node[:zenoss][:server][:zenhome]
+                     'LD_LIBRARY_PATH' => "#{node['zenoss']['server']['zenhome']}/lib",
+                     'PYTHONPATH' => "#{node['zenoss']['server']['zenhome']}/lib/python",
+                     'ZENHOME' => node['zenoss']['server']['zenhome']
                    })
-      command "#{node[:zenoss][:server][:zenhome]}/bin/zenpack --install=#{zpfile}"
+      command "#{node['zenoss']['server']['zenhome']}/bin/zenpack --install=#{zpfile}"
       action :run
     end
     new_resource.updated_by_last_action(true)
@@ -55,11 +55,11 @@ action :remove do
     execute "zenpack --remove" do
       user "zenoss"
       environment ({
-                     'LD_LIBRARY_PATH' => "#{node[:zenoss][:server][:zenhome]}/lib",
-                     'PYTHONPATH' => "#{node[:zenoss][:server][:zenhome]}/lib/python",
-                     'ZENHOME' => node[:zenoss][:server][:zenhome]
+                     'LD_LIBRARY_PATH' => "#{node['zenoss']['server']['zenhome']}/lib",
+                     'PYTHONPATH' => "#{node['zenoss']['server']['zenhome']}/lib/python",
+                     'ZENHOME' => node['zenoss']['server']['zenhome']
                    })
-      command "#{node[:zenoss][:server][:zenhome]}/bin/zenpack --remove=#{new_resource.package}"
+      command "#{node['zenoss']['server']['zenhome']}/bin/zenpack --remove=#{new_resource.package}"
       action :run
     end
     new_resource.updated_by_last_action(true)
@@ -70,7 +70,7 @@ end
 def load_current_resource
   @zenpack = Chef::Resource::ZenossZenpack.new(new_resource.package)
   Chef::Log.debug("Checking for ZenPack #{new_resource.name}")
-  zp = shell_out("sudo -u zenoss -i #{node[:zenoss][:server][:zenhome]}/bin/zenpack --list")
+  zp = shell_out("sudo -u zenoss -i #{node['zenoss']['server']['zenhome']}/bin/zenpack --list")
   exists = zp.stdout.include?(new_resource.package)
   @zenpack.exists(exists)
 end

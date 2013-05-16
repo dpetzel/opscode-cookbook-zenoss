@@ -17,11 +17,11 @@ action :run do
     user "zenoss"
     cwd Chef::Config[:file_cache_path]
     environment ({
-                   'LD_LIBRARY_PATH' => "#{node[:zenoss][:server][:zenhome]}/lib",
-                   'PYTHONPATH' => "#{node[:zenoss][:server][:zenhome]}/lib/python",
-                   'ZENHOME' => node[:zenoss][:server][:zenhome]
+                   'LD_LIBRARY_PATH' => "#{node['zenoss']['server']['zenhome']}/lib",
+                   'PYTHONPATH' => "#{node['zenoss']['server']['zenhome']}/lib/python",
+                   'ZENHOME' => node['zenoss']['server']['zenhome']
                  })
-    command "#{node[:zenoss][:server][:zenhome]}/bin/zendmd --commit --script=#{dmdscript}"
+    command "#{node['zenoss']['server']['zenhome']}/bin/zendmd --commit --script=#{dmdscript}"
     action :run
   end
   #remove the temp file
