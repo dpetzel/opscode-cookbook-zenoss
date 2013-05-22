@@ -1,5 +1,7 @@
 actions :run, :deviceclass, :group, :system, :location, :users
 
+default_action :run
+
 attribute :name, :kind_of => String, :name_attribute => true
 attribute :command, :kind_of => String #command to run via zendmd
 attribute :description, :kind_of => String

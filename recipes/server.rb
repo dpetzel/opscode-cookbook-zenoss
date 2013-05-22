@@ -19,7 +19,7 @@
 # limitations under the License.
 #
 
-case node[:platform]
+case node['platform']
 when "centos","redhat","scientific"
   package "libgcj" #moved here to make CentOS 5.6 happy (COOK-908)
 
@@ -83,7 +83,7 @@ when "debian","ubuntu"
 
   #Zenoss hasn't signed their repository http://dev.zenoss.org/trac/ticket/7421
   apt_package "zenoss-stack" do
-    version node["zenoss"]["server"]["version"]
+    version node['zenoss']['server']['version']
     options "--allow-unauthenticated"
     action :install
   end
@@ -103,7 +103,7 @@ end
 
 #the Zenoss installer puts the service in place, just start it
 service "zenoss" do
-  case node["platform"]
+  case node['platform']
   when "debian", "ubuntu"
     service_name "zenoss-stack"
   when "redhat", "centos", "scientific"
@@ -120,7 +120,7 @@ end
 
 #use zendmd to set the admin password
 zenoss_zendmd "set admin pass" do
-  command "app.acl_users.userManager.updateUserPassword('admin', '#{node[:zenoss][:server][:admin_password]}')"
+  command "app.acl_users.userManager.updateUserPassword('admin', '#{node['zenoss']['server']['admin_password']}')"
   action :run
 end
 
@@ -156,25 +156,25 @@ execute "ssh-keygen -q -t dsa -f /home/zenoss/.ssh/id_dsa -N \"\" " do
   user "zenoss"
   action :run
   not_if {File.exists?("/home/zenoss/.ssh/id_dsa.pub")}
-  notifies :create, resources(:ruby_block => "zenoss public key"), :immediate
+  notifies :create, "ruby_block[zenoss public key]", :immediate
 end
 
 #this list should get appended by other recipes
-node["zenoss"]["server"]["installed_zenpacks"].each do |package, zpversion|
-  zenoss_zenpack "#{package}" do
+node['zenoss']['server']['installed_zenpacks'].each do |package, zpversion|
+  zenoss_zenpack package do
     version zpversion
     action :install
-    notifies :restart, resources(:service => "zenoss"), :immediate
+    notifies :restart, "service[zenoss]", :immediate
   end
 end
 
 #move the localhost to SSH monitoring since we're not using SNMP
 zenoss_zendmd "move Zenoss server" do
-  batch = "dev = dmd.Devices.findDevice('#{node[:fqdn]}')\n"
+  batch = "dev = dmd.Devices.findDevice('#{node['fqdn']}')\n"
   batch += "if not dev:\n"
   batch += "    dev = dmd.Devices.findDevice('localhost*')\n\n"
   batch += "dev.changeDeviceClass('/Server/SSH/Linux')\n"
-  batch += "dev.setManageIp('#{node[:ipaddress]}')"
+  batch += "dev.setManageIp('#{node['ipaddress']}')"
   command batch
   action :run
 end

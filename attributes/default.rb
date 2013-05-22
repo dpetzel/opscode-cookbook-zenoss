@@ -21,24 +21,24 @@
 
 ::Chef::Node.send(:include, Opscode::OpenSSL::Password)
 
-set_unless[:zenoss][:server][:admin_password] = secure_password
+set_unless['zenoss']['server']['admin_password'] = secure_password
 
-default[:zenoss][:device][:device_class]    = "/Discovered" #overwritten by roles or on nodes
-default[:zenoss][:device][:location]        = "" #overwritten by roles or on nodes
-default[:zenoss][:device][:modeler_plugins] = [] #overwritten by roles or on nodes
-default[:zenoss][:device][:properties]      = {} #overwritten by roles or on nodes
-default[:zenoss][:device][:templates]       = [] #overwritten by roles or on nodes
-default[:zenoss][:server][:version]         = "3.2.1-0"
-default[:zenoss][:server][:zenoss_pubkey]   = "" #gets set in the server recipe, read by clients
+default['zenoss']['device']['device_class']    = "/Discovered" #overwritten by roles or on nodes
+default['zenoss']['device']['location']        = "" #overwritten by roles or on nodes
+default['zenoss']['device']['modeler_plugins'] = [] #overwritten by roles or on nodes
+default['zenoss']['device']['properties']      = {} #overwritten by roles or on nodes
+default['zenoss']['device']['templates']       = [] #overwritten by roles or on nodes
+default['zenoss']['server']['version']         = "3.2.1-0"
+default['zenoss']['server']['zenoss_pubkey']   = "" #gets set in the server recipe, read by clients
 case node['platform']
 when "ubuntu","debian"
-  default[:zenoss][:server][:zenhome]         = "/usr/local/zenoss/zenoss" #RPM is different
+  default['zenoss']['server']['zenhome']         = "/usr/local/zenoss/zenoss" #RPM is different
 when "redhat","centos","scientific"
-  default[:zenoss][:server][:zenhome]         = "/opt/zenoss" #RPM is different
+  default['zenoss']['server']['zenhome']         = "/opt/zenoss" #RPM is different
 end
 
 #it might matter that these get ordered eventually
-default[:zenoss][:server][:installed_zenpacks] = {
+default['zenoss']['server']['installed_zenpacks'] = {
   "ZenPacks.zenoss.DeviceSearch" => "1.0.0",
   "ZenPacks.zenoss.LinuxMonitor"  => "1.1.5",
   "ZenPacks.community.MySQLSSH"  => "0.4",
@@ -46,6 +46,6 @@ default[:zenoss][:server][:installed_zenpacks] = {
 
 #patches from http://dev.zenoss.com/trac/report/6 marked 'closed'
 #it might matter that these get ordered eventually as well
-default[:zenoss][:server][:zenpatches] = {
+default['zenoss']['server']['zenpatches'] = {
 
 }
