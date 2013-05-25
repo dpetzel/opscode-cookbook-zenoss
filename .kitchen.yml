@@ -1,6 +1,9 @@
 ---
 driver_plugin: vagrant
 driver_config:
+  customize:
+    # Zenoss doesn't do well with the default 256MB
+    memory: 1024
   require_chef_omnibus: true
 
 platforms:
@@ -27,3 +30,11 @@ suites:
   - recipe[minitest-handler]
   - recipe[zenoss]
   attributes: {}
+- name: zenoss_core3
+  run_list: 
+  - recipe[minitest-handler]
+  - recipe[zenoss::server]
+  attributes:
+    zenoss:
+      server:
+        version: "3.2.1-0"

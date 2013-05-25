@@ -24,9 +24,9 @@ include_recipe "openssh"
 #create a 'zenoss' user for monitoring
 user "zenoss" do
   comment "Zenoss monitoring account"
-  home "/home/zenoss" unless node[:os] == "windows"
-  supports :manage_home => true unless node[:os] == "windows"
-  shell "/bin/bash" unless node[:os] == "windows"
+  home "/home/zenoss" unless node["os"] == "windows"
+  supports :manage_home => true unless node["os"] == "windows"
+  shell "/bin/bash" unless node["os"] == "windows"
   action :create
 end
 
@@ -35,11 +35,11 @@ directory "/home/zenoss/.ssh" do
   owner "zenoss"
   mode "0700"
   action :create
-  not_if { node[:os] == "windows" }
+  not_if { node["os"] == "windows" }
 end
 
 #get the zenoss user public key via search
-if Chef::Config[:solo]
+if Chef::Config["solo"]
   Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
   server = []
 else
@@ -57,7 +57,7 @@ if server.length > 0
       mode "0600"
       content pubkey
       action :create
-      not_if { node[:os] == "windows" }
+      not_if { node["os"] == "windows" }
     end
   else
     Chef::Log.info("No Zenoss server found, device is unmonitored.")
