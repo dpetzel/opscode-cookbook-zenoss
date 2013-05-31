@@ -20,22 +20,26 @@
 #
 
 include_recipe "openssh"
+include_recipe "snmp"
 
 #create a 'zenoss' user for monitoring
-user "zenoss" do
+user node['zenoss']['client']['zenoss_user_name'] do
   comment "Zenoss monitoring account"
-  home "/home/zenoss" unless node["os"] == "windows"
+  home node['zenoss']['client']['zenoss_user_homedir'] unless node["os"] == "windows"
   supports :manage_home => true unless node["os"] == "windows"
   shell "/bin/bash" unless node["os"] == "windows"
   action :create
+  only_if { node['zenoss']['client']['create_local_zenoss_user'] == true }
 end
 
 #create a home directory for them
-directory "/home/zenoss/.ssh" do
-  owner "zenoss"
+ssh_dir = ::File.join(node['zenoss']['client']['zenoss_user_homedir'], ".ssh")
+directory ssh_dir do
+  owner node['zenoss']['client']['zenoss_user_name']
   mode "0700"
   action :create
   not_if { node["os"] == "windows" }
+  only_if { node['zenoss']['client']['create_local_zenoss_user'] == true }
 end
 
 #get the zenoss user public key via search
@@ -51,9 +55,9 @@ if server.length > 0
   zenoss = server[0]["zenoss"]
   if zenoss["server"] and zenoss["server"]["zenoss_pubkey"]
     pubkey = zenoss["server"]["zenoss_pubkey"]
-    file "/home/zenoss/.ssh/authorized_keys" do
+    file "#{ssh_dir}/authorized_keys" do
       backup false
-      owner "zenoss"
+      owner node['zenoss']['client']['zenoss_user_name']
       mode "0600"
       content pubkey
       action :create
